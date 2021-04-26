@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:email_validator/email_validator.dart';
-import 'package:week10/register_page.dart';
 import 'package:week10/sign_in.dart';
-import 'package:week10/first_screen.dart';
 
-class LoginPage extends StatefulWidget {
+class RegisterPage extends StatefulWidget {
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _RegisterPageState createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   bool _showPassword = false;
   bool passwordVisible = false;
-  User user;
   final _formKey = GlobalKey<FormState>();
   String error = "";
   TextEditingController passwordController = TextEditingController();
@@ -22,6 +18,10 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        title: Text("Sign Up Email"),
+      ),
       body: Container(
         color: Colors.white,
         child: Center(
@@ -30,9 +30,7 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                SizedBox(height: 50),
                 FlutterLogo(size: 150),
-                SizedBox(height: 25),
                 Container(
                   child: Form(
                     key: _formKey,
@@ -48,14 +46,14 @@ class _LoginPageState extends State<LoginPage> {
                             Padding(
                               padding: const EdgeInsets.all(15.0),
                               child: Text(
-                                "Login",
+                                "Register",
                                 style: TextStyle(
                                     fontWeight: FontWeight.w800, fontSize: 25),
                               ),
                             ),
                             Text(
-                                errorMessageLogin != null
-                                    ? errorMessageLogin
+                                errorMessageRegister != null
+                                    ? errorMessageRegister
                                     : "",
                                 style: TextStyle(color: Colors.red)),
                             Padding(
@@ -93,6 +91,9 @@ class _LoginPageState extends State<LoginPage> {
                                   // add your custom validation here.
                                   if (value.isEmpty) {
                                     return 'Empty Field, Please enter some text';
+                                  }
+                                  if (value.length < 6) {
+                                    return 'Must be more than 6 charater';
                                   }
                                 },
                                 controller: passwordController,
@@ -151,7 +152,7 @@ class _LoginPageState extends State<LoginPage> {
                                           color: Colors.white,
                                         ),
                                         Text(
-                                          'Sign in with Email',
+                                          'Sign Up with Email',
                                           style: TextStyle(
                                               fontSize: 16.0,
                                               fontWeight: FontWeight.bold,
@@ -160,27 +161,15 @@ class _LoginPageState extends State<LoginPage> {
                                       ],
                                     ))),
                                 onTap: () async {
-                                  signWithEmailAndPassword(emailController.text,
+                                  signUp(emailController.text,
                                           passwordController.text)
                                       .then((result) {
                                     if (result != null) {
-                                      String email = result.email;
-                                      String name = "User";
-                                      String image =
-                                          "https://www.pngkit.com/png/full/281-2812821_user-account-management-logo-user-icon-png.png";
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (context) {
-                                            return FirstScreen(
-                                                email: email,
-                                                name: name,
-                                                image: image);
-                                          },
-                                        ),
-                                      );
+                                      Navigator.pop(context);
                                     } else {
                                       setState(() {
-                                        errorMessageLogin = errorMessageLogin;
+                                        errorMessageRegister =
+                                            errorMessageRegister;
                                       });
                                     }
                                   });
@@ -188,82 +177,16 @@ class _LoginPageState extends State<LoginPage> {
                             SizedBox(
                               height: 16,
                             ),
+                            Text(error),
                           ],
                         ),
                       ),
                     ),
                   ),
                 ),
-                MaterialButton(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("Don't have an account?"),
-                      Text(
-                        " SIGN UP",
-                        style: TextStyle(color: Colors.blue),
-                      ),
-                    ],
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return RegisterPage();
-                        },
-                      ),
-                    );
-                  },
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: _signInButton(),
-                ),
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _signInButton() {
-    return OutlineButton(
-      splashColor: Colors.grey,
-      onPressed: () {
-        signInWithGoogle().then((result) {
-          if (result != null) {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) {
-                  return FirstScreen();
-                },
-              ),
-            );
-          }
-        });
-      },
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
-      highlightElevation: 0,
-      borderSide: BorderSide(color: Colors.grey),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Image(image: AssetImage("assets/google-logo.png"), height: 35.0),
-            Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: Text(
-                'Sign in with Google',
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.grey,
-                ),
-              ),
-            )
-          ],
         ),
       ),
     );
